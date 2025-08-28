@@ -36,7 +36,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff);font-s
 .kicon.active{border-color:var(--brand)}
 /* Crear contacto */
 .create{background:#fff;border:1px dashed var(--line);border-radius:12px;padding:8px;display:grid;gap:6px;margin-bottom:10px}
-.create .row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.create .row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .create input{border:1px solid var(--line);border-radius:10px;padding:7px 9px;min-height:30px}
 .create .btn{background:var(--brand);color:#fff;border:none;border-radius:10px;padding:7px 9px;font-weight:700;cursor:pointer;font-size:12px}
 /* Board */
@@ -143,6 +143,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff);font-s
       <div class="row">
         <input id="c_nombre" placeholder="Nombre">
         <input id="c_apellidos" placeholder="Apellidos">
+        <input id="c_dni" placeholder="DNI">
         <input id="c_email" placeholder="Email">
         <input id="c_movil" placeholder="Móvil">
       </div>
@@ -351,13 +352,14 @@ function moveToPhase(idp, phase){
 $('btn_create').onclick=function(){
   const nombre=($('c_nombre').value||'').trim();
   const ap=($('c_apellidos').value||'').trim();
+  const dni=($('c_dni').value||'').trim();
   const email=($('c_email').value||'').trim();
   const movil=($('c_movil').value||'').trim();
-  if(!nombre || !email || !movil){ toast('Nombre, email y móvil son obligatorios','warn'); return; }
+  if(!nombre || !dni || !email || !movil){ toast('Nombre, DNI, email y móvil son obligatorios','warn'); return; }
   const list=Store.pros||[];
   list.push({
     id:'p_'+Date.now(), ts:Date.now(),
-    nombre:nombre, apellidos:ap, email:email, movil:movil,
+    nombre:nombre, apellidos:ap, dni:dni, email:email, movil:movil,
     fase:'CONTACTO',
     prefs:{tipo:'Tradicional', localidades:'', ascensor:'Sí', bajo:'No', reforma:'No', altura:5},
     obj_main:'bruta', obj_bruta_pct:10, psi_en_rentab:false,
@@ -365,7 +367,7 @@ $('btn_create').onclick=function(){
     asset_ids:[]
   });
   Store.pros=list;
-  $('c_nombre').value=''; $('c_apellidos').value=''; $('c_email').value=''; $('c_movil').value='';
+  $('c_nombre').value=''; $('c_apellidos').value=''; $('c_dni').value=''; $('c_email').value=''; $('c_movil').value='';
   render(); toast('Creado','ok');
 };
 function delProspect(idp){
