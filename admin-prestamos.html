@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Smartflip — Administración de Préstamos</title>
+<style>
+:root{
+  --brand:#2E7D32; --accent:#4CAF50; --ok:#2E7D32; --bad:#B53928; --warning:#F57C00;
+  --line:#E0E0E0; --chip:#F8F9FA; --bg:#F5F5F5; --ink:#1a1f23; --ink2:#535b63;
+  --shadow:0 4px 22px rgba(0,0,0,.1); --ff:system-ui,-apple-system,Inter,Roboto,Arial,sans-serif; --fz:14px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff);font-size:var(--fz)}
+
+/* Header */
+.header{
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  padding:16px 0;
+  box-shadow:var(--shadow);
+}
+
+.header-inner{
+  max-width:1400px;
+  margin:0 auto;
+  padding:0 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.logo h1{
+  margin:0;
+  color:var(--brand);
+  font-size:24px;
+  font-weight:800;
+}
+
+.logo .subtitle{
+  color:var(--ink2);
+  font-size:14px;
+}
+
+.nav{
+  display:flex;
+  gap:20px;
+}
+
+.nav a{
+  color:var(--ink2);
+  text-decoration:none;
+  padding:8px 16px;
+  border-radius:8px;
+  font-weight:500;
+}
+
+.nav a.active{
+  background:var(--brand);
+  color:#fff;
+}
+
+.nav a:hover{
+  background:var(--chip);
+}
+
+/* Container */
+.container{
+  max-width:1400px;
+  margin:0 auto;
+  padding:24px 20px;
+}
+
+/* Stats */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+  gap:16px;
+  margin-bottom:24px;
+}
+
+.stat-card{
+  background:#fff;
+  border-radius:12px;
+  padding:20px;
+  box-shadow:var(--shadow);
+  text-align:center;
+}
+
+.stat-value{
+  font-size:24px;
+  font-weight:800;
+  margin-bottom:4px;
+}
+
+.stat-label{
+  color:var(--ink2);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+
+.stat-card.total .stat-value{color:var(--brand)}
+.stat-card.active .stat-value{color:var(--ok)}
+.stat-card.amount .stat-value{color:#1976D2}
+.stat-card.pending .stat-value{color:var(--warning)}
+
+/* Main grid */
+.main-grid{
+  display:grid;
+  grid-template-columns:1fr 400px;
+  gap:24px;
+}
+
+/* Loans list */
+.loans-section{
+  background:#fff;
+  border-radius:12px;
+  padding:24px;
+  box-shadow:var(--shadow);
+}
+
+.section-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.section-title{
+  margin:0;
+  color:var(--ink);
+  font-size:20px;
+}
+
+.filters{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.filter-select{
+  padding:6px 12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#fff;
+  font-size:12px;
+}
+
+.search-box{
+  padding:6px 12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#fff;
+  font-size:12px;
+  width:200px;
+}
+
+/* Loan item */
+.loan-item{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:12px;
+  background:#fafafa;
+  cursor:pointer;
+  transition:all 0.2s ease;
+}
+
+.loan-item:hover{
+  background:#f0f0f0;
+  border-color:var(--brand);
+}
+
+.loan-item.selected{
+  border-color:var(--brand);
+  background:#E8F5E8;
+}
+
+.loan-item-header{
+  display:flex;
+  justify-content:between;
+  align-items:center;
+  margin-bottom:8px;
+}
+
+.loan-client{
+  font-weight:700;
+  color:var(--ink);
+}
+
+.loan-concept{
+  font-size:12px;
+  color:var(--ink2);
+}
+
+.loan-amount{
+  font-weight:700;
+  color:var(--brand);
+  text-align:right;
+}
+
+.loan-item-details{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:8px;
+  font-size:12px;
+  color:var(--ink2);
+}
+
+.loan-status-badge{
+  padding:2px 8px;
+  border-radius:12px;
+  font-size:10px;
+  font-weight:600;
+  text-transform:uppercase;
+}
+
+.status-active{background:#E8F5E8; color:var(--brand)}
+.status-completed{background:#E3F2FD; color:#1976D2}
+.status-pending{background:#FFF3E0; color:var(--warning)}
+
+/* Sidebar */
+.sidebar{
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+}
+
+/* Create loan form */
+.create-form{
+  background:#fff;
+  border-radius:12px;
+  padding:24px;
+  box-shadow:var(--shadow);
+}
+
+.form-title{
+  margin:0 0 20px;
+  color:var(--ink);
+  font-size:18px;
+}
+
+.form-group{
+  margin-bottom:16px;
+}
+
+.form-group label{
+  display:block;
+  margin-bottom:4px;
+  font-weight:600;
+  color:var(--ink);
+  font-size:12px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+  width:100%;
+  padding:8px 12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  font-size:13px;
+  background:#fff;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+  outline:none;
+  border-color:var(--brand);
+  box-shadow:0 0 0 2px rgba(46,125,50,0.1);
+}
+
+.form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.btn{
+  background:var(--brand);
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  padding:10px 16px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  width:100%;
+}
+
+.btn:hover{
+  background:#1B5E20;
+}
+
+.btn:disabled{
+  background:#ccc;
+  cursor:not-allowed;
+}
+
+.btn-secondary{
+  background:#fff;
+  color:var(--brand);
+  border:1px solid var(--brand);
+}
+
+.btn-secondary:hover{
+  background:var(--chip);
+}
+
+/* Loan details */
+.loan-details{
+  background:#fff;
+  border-radius:12px;
+  padding:24px;
+  box-shadow:var(--shadow);
+}
+
+.details-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.details-title{
+  margin:0;
+  color:var(--ink);
+  font-size:18px;
+}
+
+.detail-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:16px;
+  margin-bottom:20px;
+}
+
+.detail-item{
+  padding:12px;
+  background:var(--chip);
+  border-radius:8px;
+}
+
+.detail-label{
+  font-size:11px;
+  color:var(--ink2);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin-bottom:4px;
+}
+
+.detail-value{
+  font-size:16px;
+  font-weight:700;
+  color:var(--brand);
+}
+
+/* Amortization table */
+.amortization{
+  margin-top:20px;
+}
+
+.amortization h4{
+  margin:0 0 12px;
+  color:var(--ink);
+}
+
+.amortization-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+}
+
+.amortization-table th{
+  background:var(--chip);
+  padding:8px 6px;
+  text-align:left;
+  font-weight:600;
+  color:var(--ink2);
+  border-bottom:1px solid var(--line);
+}
+
+.amortization-table td{
+  padding:6px;
+  border-bottom:1px solid #f0f0f0;
+}
+
+.amortization-table tr:hover{
+  background:#f9f9f9;
+}
+
+.payment-paid{background:#E8F5E8}
+.payment-pending{background:#FFF3E0}
+.payment-overdue{background:#FFEBEE}
+
+/* Empty states */
+.empty-state{
+  text-align:center;
+  padding:40px;
+  color:var(--ink2);
+}
+
+.empty-state h3{
+  margin:0 0 8px;
+  color:var(--ink);
+}
+
+/* Responsive */
+@media (max-width: 1024px){
+  .main-grid{
+    grid-template-columns:1fr;
+  }
+  
+  .sidebar{
+    flex-direction:row;
+  }
+  
+  .detail-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width: 768px){
+  .sidebar{
+    flex-direction:column;
+  }
+  
+  .filters{
+    flex-direction:column;
+    align-items:stretch;
+  }
+  
+  .search-box{
+    width:100%;
+  }
+}
+
+/* Toast */
+.toast{
+  position:fixed;
+  top:20px;
+  right:20px;
+  background:var(--brand);
+  color:#fff;
+  padding:12px 20px;
+  border-radius:8px;
+  box-shadow:var(--shadow);
+  z-index:1000;
+  opacity:0;
+  transform:translateX(100%);
+  transition:all 0.3s ease;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(0);
+}
+
+.toast.error{
+  background:var(--bad);
+}
+
+/* New section styles */
+.main-section{
+  display:none;
+}
+
+.main-section.active{
+  display:block;
+}
+
+.section-content{
+  background:#fff;
+  border-radius:12px;
+  padding:24px;
+  box-shadow:var(--shadow);
+  margin-bottom:20px;
+}
+
+.section-content h2{
+  margin:0 0 20px;
+  color:var(--ink);
+  font-size:24px;
+}
+
+/* Tabs */
+.tabs-container{
+  margin-top:20px;
+}
+
+.tabs{
+  display:flex;
+  border-bottom:1px solid var(--line);
+  margin-bottom:20px;
+}
+
+.tab-btn{
+  padding:12px 20px;
+  border:none;
+  background:none;
+  color:var(--ink2);
+  cursor:pointer;
+  border-bottom:2px solid transparent;
+  font-size:14px;
+}
+
+.tab-btn.active{
+  color:var(--brand);
+  border-bottom-color:var(--brand);
+}
+
+.tab-content{
+  display:none;
+}
+
+.tab-content.active{
+  display:block;
+}
+
+/* Config grid */
+.config-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+  gap:20px;
+}
+
+.config-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+
+.config-card h3{
+  margin:0 0 16px;
+  color:var(--ink);
+  font-size:18px;
+}
+
+/* Client and employee items */
+.client-item, .employee-item{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:12px;
+  background:#fafafa;
+  cursor:pointer;
+  transition:all 0.2s ease;
+}
+
+.client-item:hover, .employee-item:hover{
+  background:#f0f0f0;
+  border-color:var(--brand);
+}
+
+.client-item-header, .employee-item-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+
+.client-name, .employee-name{
+  font-weight:700;
+  color:var(--ink);
+}
+
+.client-dni, .employee-dni{
+  font-size:12px;
+  color:var(--ink2);
+  background:var(--chip);
+  padding:2px 6px;
+  border-radius:4px;
+}
+
+.client-contact, .employee-contact{
+  font-size:12px;
+  color:var(--ink2);
+}
+
+.employee-role{
+  font-size:12px;
+  color:var(--ink2);
+  background:var(--accent);
+  color:#fff;
+  padding:2px 6px;
+  border-radius:4px;
+  text-transform:uppercase;
+}
+
+/* Receipt items */
+.receipt-item{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:12px;
+  background:#fafafa;
+  cursor:pointer;
+  transition:all 0.2s ease;
+}
+
+.receipt-item:hover{
+  background:#f0f0f0;
+  border-color:var(--brand);
+}
+
+.receipt-item-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+
+.receipt-number{
+  font-weight:700;
+  color:var(--ink);
+}
+
+.receipt-status{
+  font-size:12px;
+  padding:2px 6px;
+  border-radius:4px;
+  text-transform:uppercase;
+}
+
+.receipt-status.paid{
+  background:#E8F5E8;
+  color:var(--ok);
+}
+
+.receipt-status.pending{
+  background:#FFF3E0;
+  color:var(--warning);
+}
+
+.receipt-status.overdue{
+  background:#FFEBEE;
+  color:var(--bad);
+}
+
+.receipt-details{
+  font-size:12px;
+  color:var(--ink2);
+}
+
+.auto-receipts{
+  background:var(--chip);
+  border-radius:12px;
+  padding:16px;
+  margin-top:20px;
+}
+
+.auto-receipts h3{
+  margin:0 0 8px;
+  font-size:16px;
+}
+
+.auto-receipts p{
+  margin:0 0 12px;
+  font-size:12px;
+  color:var(--ink2);
+}
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <h1>SMARTFLIP</h1>
+        <div class="subtitle">Administración</div>
+      </div>
+      <nav class="nav">
+        <a href="#" id="navPrestamos" class="active">Préstamos</a>
+        <a href="#" id="navUsuarios">Gestión de Usuarios</a>
+        <a href="#" id="navRecibos">Recibos</a>
+        <a href="#" id="navConfiguracion">Configuración</a>
+        <a href="#" id="navLogout">Cerrar Sesión</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="stats" id="stats">
+      <!-- Stats will be populated by JavaScript -->
+    </div>
+
+    <!-- Préstamos Section -->
+    <div id="seccionPrestamos" class="main-section">
+      <div class="main-grid">
+        <div class="loans-section">
+          <div class="section-header">
+            <h3 class="section-title">Gestión de Préstamos</h3>
+            <div class="filters">
+              <select class="filter-select" id="statusFilter">
+                <option value="all">Todos los estados</option>
+                <option value="active">Activos</option>
+                <option value="completed">Completados</option>
+                <option value="pending">Pendientes</option>
+              </select>
+              <input type="text" class="search-box" id="searchBox" placeholder="Buscar cliente...">
+            </div>
+          </div>
+          <div id="loansContainer">
+            <!-- Loans will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <div class="sidebar">
+          <div class="create-form">
+            <h3 class="form-title">Crear Nuevo Préstamo</h3>
+            <form id="createLoanForm">
+              <div class="form-group">
+                <label for="clientSelect">Cliente</label>
+                <select id="clientSelect" required>
+                  <option value="">Seleccionar cliente</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="concept">Concepto</label>
+                <input type="text" id="concept" placeholder="Préstamo personal" required>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="amount">Importe (€)</label>
+                  <input type="number" id="amount" placeholder="50000" min="1000" step="100" required>
+                </div>
+                <div class="form-group">
+                  <label for="interestRate">Tipo (%)</label>
+                  <input type="number" id="interestRate" placeholder="4.5" min="0.1" max="20" step="0.1" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="termMonths">Plazo (meses)</label>
+                  <input type="number" id="termMonths" placeholder="24" min="6" max="120" required>
+                </div>
+                <div class="form-group">
+                  <label for="startDate">Fecha inicio</label>
+                  <input type="date" id="startDate" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="notes">Notas (opcional)</label>
+                <textarea id="notes" rows="3" placeholder="Observaciones adicionales..."></textarea>
+              </div>
+
+              <button type="submit" class="btn">Crear Préstamo</button>
+            </form>
+          </div>
+
+          <div class="loan-details" id="loanDetails" style="display:none">
+            <!-- Loan details will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gestión de Usuarios Section -->
+    <div id="seccionUsuarios" class="main-section" style="display:none">
+      <div class="section-content">
+        <h2>Gestión de Usuarios y Empleados</h2>
+        
+        <div class="tabs-container">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="clientes">Clientes</button>
+            <button class="tab-btn" data-tab="empleados">Empleados</button>
+          </div>
+          
+          <!-- Tab Clientes -->
+          <div class="tab-content active" id="tabClientes">
+            <div class="main-grid">
+              <div class="clients-list">
+                <div class="section-header">
+                  <h3 class="section-title">Lista de Clientes</h3>
+                  <input type="text" class="search-box" id="searchClients" placeholder="Buscar cliente...">
+                </div>
+                <div id="clientsContainer">
+                  <!-- Clients will be populated by JavaScript -->
+                </div>
+              </div>
+              
+              <div class="sidebar">
+                <div class="create-form">
+                  <h3 class="form-title">Crear Cliente</h3>
+                  <form id="createClientForm">
+                    <div class="form-group">
+                      <label for="clientNombre">Nombre</label>
+                      <input type="text" id="clientNombre" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="clientApellidos">Apellidos</label>
+                      <input type="text" id="clientApellidos" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="clientDni">DNI</label>
+                      <input type="text" id="clientDni" pattern="[0-9]{8}[A-Z]" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="clientEmail">Email</label>
+                      <input type="email" id="clientEmail" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="clientMovil">Móvil</label>
+                      <input type="tel" id="clientMovil" required>
+                    </div>
+                    <button type="submit" class="btn">Crear Cliente</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Tab Empleados -->
+          <div class="tab-content" id="tabEmpleados">
+            <div class="main-grid">
+              <div class="employees-list">
+                <div class="section-header">
+                  <h3 class="section-title">Lista de Empleados</h3>
+                  <input type="text" class="search-box" id="searchEmployees" placeholder="Buscar empleado...">
+                </div>
+                <div id="employeesContainer">
+                  <!-- Employees will be populated by JavaScript -->
+                </div>
+              </div>
+              
+              <div class="sidebar">
+                <div class="create-form">
+                  <h3 class="form-title">Crear Empleado</h3>
+                  <form id="createEmployeeForm">
+                    <div class="form-group">
+                      <label for="empNombre">Nombre</label>
+                      <input type="text" id="empNombre" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="empApellidos">Apellidos</label>
+                      <input type="text" id="empApellidos" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="empDni">DNI</label>
+                      <input type="text" id="empDni" pattern="[A-Z][0-9]{8}" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="empEmail">Email</label>
+                      <input type="email" id="empEmail" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="empPassword">Contraseña</label>
+                      <input type="password" id="empPassword" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="empRole">Rol</label>
+                      <select id="empRole" required>
+                        <option value="">Seleccionar rol</option>
+                        <option value="admin">Administrador</option>
+                        <option value="manager">Gestor</option>
+                        <option value="agent">Agente</option>
+                      </select>
+                    </div>
+                    <button type="submit" class="btn">Crear Empleado</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recibos Section -->
+    <div id="seccionRecibos" class="main-section" style="display:none">
+      <div class="section-content">
+        <h2>Gestión de Recibos</h2>
+        
+        <div class="main-grid">
+          <div class="receipts-section">
+            <div class="section-header">
+              <h3 class="section-title">Lista de Recibos</h3>
+              <div class="filters">
+                <select class="filter-select" id="receiptStatusFilter">
+                  <option value="all">Todos</option>
+                  <option value="paid">Pagados</option>
+                  <option value="pending">Pendientes</option>
+                  <option value="overdue">Vencidos</option>
+                </select>
+                <input type="text" class="search-box" id="searchReceipts" placeholder="Buscar recibo...">
+              </div>
+            </div>
+            <div id="receiptsContainer">
+              <!-- Receipts will be populated by JavaScript -->
+            </div>
+          </div>
+
+          <div class="sidebar">
+            <div class="create-form">
+              <h3 class="form-title">Crear Recibo Manual</h3>
+              <form id="createReceiptForm">
+                <div class="form-group">
+                  <label for="receiptClient">Cliente</label>
+                  <select id="receiptClient" required>
+                    <option value="">Seleccionar cliente</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="receiptLoan">Préstamo</label>
+                  <select id="receiptLoan" required>
+                    <option value="">Seleccionar préstamo</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="receiptAmount">Importe (€)</label>
+                  <input type="number" id="receiptAmount" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                  <label for="receiptDate">Fecha</label>
+                  <input type="date" id="receiptDate" required>
+                </div>
+                <div class="form-group">
+                  <label for="receiptConcept">Concepto</label>
+                  <input type="text" id="receiptConcept" placeholder="Pago cuota mensual" required>
+                </div>
+                <button type="submit" class="btn">Crear Recibo</button>
+              </form>
+            </div>
+            
+            <div class="auto-receipts">
+              <h3 class="form-title">Generación Automática</h3>
+              <p>Los recibos se generan automáticamente según el calendario de pagos de cada préstamo.</p>
+              <button class="btn" id="generateAutoReceipts">Generar Recibos Automáticos</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuración Section -->
+    <div id="seccionConfiguracion" class="main-section" style="display:none">
+      <div class="section-content">
+        <h2>Configuración del Sistema</h2>
+        
+        <div class="config-grid">
+          <div class="config-card">
+            <h3>Configuración General</h3>
+            <form id="generalConfigForm">
+              <div class="form-group">
+                <label for="companyName">Nombre de la Empresa</label>
+                <input type="text" id="companyName" value="SMARTFLIP">
+              </div>
+              <div class="form-group">
+                <label for="companyAddress">Dirección</label>
+                <textarea id="companyAddress" rows="3">Calle Principal, 123&#10;28001 Madrid, España</textarea>
+              </div>
+              <div class="form-group">
+                <label for="companyPhone">Teléfono</label>
+                <input type="tel" id="companyPhone" value="+34 900 123 456">
+              </div>
+              <div class="form-group">
+                <label for="companyEmail">Email</label>
+                <input type="email" id="companyEmail" value="info@smartflip.es">
+              </div>
+              <button type="submit" class="btn">Guardar Configuración</button>
+            </form>
+          </div>
+          
+          <div class="config-card">
+            <h3>Reglas de Negocio</h3>
+            <form id="businessRulesForm">
+              <div class="form-group">
+                <label for="minLoanAmount">Importe Mínimo de Préstamo (€)</label>
+                <input type="number" id="minLoanAmount" value="1000" min="500">
+              </div>
+              <div class="form-group">
+                <label for="maxLoanAmount">Importe Máximo de Préstamo (€)</label>
+                <input type="number" id="maxLoanAmount" value="500000" min="1000">
+              </div>
+              <div class="form-group">
+                <label for="minInterestRate">Tipo de Interés Mínimo (%)</label>
+                <input type="number" id="minInterestRate" value="1.0" step="0.1" min="0.1">
+              </div>
+              <div class="form-group">
+                <label for="maxInterestRate">Tipo de Interés Máximo (%)</label>
+                <input type="number" id="maxInterestRate" value="15.0" step="0.1" min="0.1">
+              </div>
+              <div class="form-group">
+                <label for="minTerm">Plazo Mínimo (meses)</label>
+                <input type="number" id="minTerm" value="6" min="1">
+              </div>
+              <div class="form-group">
+                <label for="maxTerm">Plazo Máximo (meses)</label>
+                <input type="number" id="maxTerm" value="120" min="6">
+              </div>
+              <button type="submit" class="btn">Guardar Reglas</button>
+            </form>
+          </div>
+          
+          <div class="config-card">
+            <h3>Configuración de Recibos</h3>
+            <form id="receiptConfigForm">
+              <div class="form-group">
+                <label for="receiptPrefix">Prefijo de Recibos</label>
+                <input type="text" id="receiptPrefix" value="SF" maxlength="5">
+              </div>
+              <div class="form-group">
+                <label for="autoGenerate">Generación Automática</label>
+                <select id="autoGenerate">
+                  <option value="enabled">Habilitada</option>
+                  <option value="disabled">Deshabilitada</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="reminderDays">Días de Recordatorio</label>
+                <input type="number" id="reminderDays" value="5" min="1" max="30">
+              </div>
+              <button type="submit" class="btn">Guardar Configuración</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* Utilities */
+function $(id){return document.getElementById(id);}
+function formatCurrency(amount){
+  return new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR', maximumFractionDigits:2}).format(Number(amount||0));
+}
+function formatDate(date){
+  return new Date(date).toLocaleDateString('es-ES');
+}
+function formatPercent(value){
+  return `${Number(value||0).toFixed(1)}%`;
+}
+
+function showToast(message, isError = false){
+  const toast = $('toast');
+  toast.textContent = message;
+  toast.className = `toast ${isError ? 'error' : ''}`;
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+/* Store helper */
+const Store = {
+  get pros(){try{return JSON.parse(localStorage.getItem('pros')||'[]');}catch(e){return[];}},
+  set pros(v){localStorage.setItem('pros',JSON.stringify(v));},
+  get loans(){try{return JSON.parse(localStorage.getItem('loans')||'[]');}catch(e){return[];}},
+  set loans(v){localStorage.setItem('loans',JSON.stringify(v));}
+};
+
+let selectedLoanId = null;
+
+/* Loan calculations */
+function calculateMonthlyPayment(principal, annualRate, months){
+  const monthlyRate = annualRate / 100 / 12;
+  if(monthlyRate === 0) return principal / months;
+  return principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+}
+
+function generatePaymentSchedule(principal, annualRate, months, startDate){
+  const monthlyRate = annualRate / 100 / 12;
+  const monthlyPayment = calculateMonthlyPayment(principal, annualRate, months);
+  const payments = [];
+  let balance = principal;
+  
+  for(let i = 0; i < months; i++){
+    const paymentDate = new Date(startDate);
+    paymentDate.setMonth(paymentDate.getMonth() + i + 1);
+    
+    const interestPayment = balance * monthlyRate;
+    const principalPayment = monthlyPayment - interestPayment;
+    balance -= principalPayment;
+    
+    const isPaid = paymentDate < new Date();
+    
+    payments.push({
+      number: i + 1,
+      date: paymentDate.toISOString(),
+      amount: monthlyPayment,
+      principal: principalPayment,
+      interest: interestPayment,
+      balance: Math.max(0, balance),
+      status: isPaid ? 'paid' : 'pending'
+    });
+  }
+  
+  return payments;
+}
+
+/* Render functions */
+function renderStats(){
+  const loans = Store.loans;
+  const clients = Store.pros;
+  
+  const totalLoans = loans.length;
+  const activeLoans = loans.filter(l => l.status === 'active').length;
+  const totalAmount = loans.reduce((sum, loan) => sum + loan.amount, 0);
+  const totalPaid = loans.reduce((sum, loan) => {
+    return sum + loan.payments.filter(p => p.status === 'paid').reduce((pSum, p) => pSum + p.amount, 0);
+  }, 0);
+  const clientsWithLoans = new Set(loans.map(l => l.clientId)).size;
+
+  $('stats').innerHTML = `
+    <div class="stat-card total">
+      <div class="stat-value">${totalLoans}</div>
+      <div class="stat-label">Total Préstamos</div>
+    </div>
+    <div class="stat-card active">
+      <div class="stat-value">${activeLoans}</div>
+      <div class="stat-label">Préstamos Activos</div>
+    </div>
+    <div class="stat-card amount">
+      <div class="stat-value">${formatCurrency(totalAmount)}</div>
+      <div class="stat-label">Importe Total</div>
+    </div>
+    <div class="stat-card pending">
+      <div class="stat-value">${formatCurrency(totalPaid)}</div>
+      <div class="stat-label">Total Pagado</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${clientsWithLoans}</div>
+      <div class="stat-label">Clientes con Préstamos</div>
+    </div>
+  `;
+}
+
+function renderLoanItem(loan){
+  const client = Store.pros.find(c => c.id === loan.clientId);
+  const clientName = client ? `${client.nombre} ${client.apellidos}` : 'Cliente no encontrado';
+  const paidPayments = loan.payments.filter(p => p.status === 'paid').length;
+  const progress = (paidPayments / loan.payments.length) * 100;
+
+  return `
+    <div class="loan-item ${selectedLoanId === loan.id ? 'selected' : ''}" onclick="selectLoan('${loan.id}')">
+      <div class="loan-item-header">
+        <div>
+          <div class="loan-client">${clientName}</div>
+          <div class="loan-concept">${loan.concept}</div>
+        </div>
+        <div class="loan-amount">${formatCurrency(loan.amount)}</div>
+      </div>
+      <div class="loan-item-details">
+        <div>${formatPercent(loan.interestRate)} TIN</div>
+        <div>${loan.termMonths} meses</div>
+        <div>${formatPercent(progress)} completado</div>
+        <div class="loan-status-badge status-${loan.status}">
+          ${loan.status === 'active' ? 'Activo' : 'Completado'}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderLoans(){
+  const loans = Store.loans;
+  const statusFilter = $('statusFilter').value;
+  const searchTerm = $('searchBox').value.toLowerCase();
+  
+  let filteredLoans = loans;
+  
+  // Filter by status
+  if(statusFilter !== 'all'){
+    filteredLoans = filteredLoans.filter(l => l.status === statusFilter);
+  }
+  
+  // Filter by search term
+  if(searchTerm){
+    filteredLoans = filteredLoans.filter(l => {
+      const client = Store.pros.find(c => c.id === l.clientId);
+      const clientName = client ? `${client.nombre} ${client.apellidos}`.toLowerCase() : '';
+      return clientName.includes(searchTerm) || l.concept.toLowerCase().includes(searchTerm);
+    });
+  }
+  
+  if(filteredLoans.length === 0){
+    $('loansContainer').innerHTML = `
+      <div class="empty-state">
+        <h3>No se encontraron préstamos</h3>
+        <p>No hay préstamos que coincidan con los filtros aplicados</p>
+      </div>
+    `;
+  } else {
+    $('loansContainer').innerHTML = filteredLoans.map(renderLoanItem).join('');
+  }
+}
+
+function selectLoan(loanId){
+  selectedLoanId = loanId;
+  renderLoans();
+  renderLoanDetails(loanId);
+}
+
+function renderLoanDetails(loanId){
+  const loan = Store.loans.find(l => l.id === loanId);
+  if(!loan){
+    $('loanDetails').style.display = 'none';
+    return;
+  }
+  
+  const client = Store.pros.find(c => c.id === loan.clientId);
+  const clientName = client ? `${client.nombre} ${client.apellidos}` : 'Cliente no encontrado';
+  const paidPayments = loan.payments.filter(p => p.status === 'paid').length;
+  const totalPaid = loan.payments.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
+  const remaining = loan.amount - totalPaid;
+  
+  $('loanDetails').innerHTML = `
+    <div class="details-header">
+      <h3 class="details-title">Detalles del Préstamo</h3>
+      <div class="loan-status-badge status-${loan.status}">
+        ${loan.status === 'active' ? 'Activo' : 'Completado'}
+      </div>
+    </div>
+    
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-label">Cliente</div>
+        <div class="detail-value" style="color:var(--ink)">${clientName}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Concepto</div>
+        <div class="detail-value" style="color:var(--ink)">${loan.concept}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Importe</div>
+        <div class="detail-value">${formatCurrency(loan.amount)}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Cuota Mensual</div>
+        <div class="detail-value">${formatCurrency(loan.monthlyPayment)}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Pagado</div>
+        <div class="detail-value">${formatCurrency(totalPaid)}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Pendiente</div>
+        <div class="detail-value">${formatCurrency(remaining)}</div>
+      </div>
+    </div>
+    
+    <div class="amortization">
+      <h4>Tabla de Amortización (últimos 10 pagos)</h4>
+      <table class="amortization-table">
+        <thead>
+          <tr>
+            <th>Nº</th>
+            <th>Fecha</th>
+            <th>Cuota</th>
+            <th>Interés</th>
+            <th>Capital</th>
+            <th>Pendiente</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${loan.payments.slice(-10).map(p => `
+            <tr class="payment-${p.status}">
+              <td>${p.number}</td>
+              <td>${formatDate(p.date)}</td>
+              <td>${formatCurrency(p.amount)}</td>
+              <td>${formatCurrency(p.interest)}</td>
+              <td>${formatCurrency(p.principal)}</td>
+              <td>${formatCurrency(p.balance)}</td>
+              <td>${p.status === 'paid' ? 'Pagado' : 'Pendiente'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+  
+  $('loanDetails').style.display = 'block';
+}
+
+function populateClientSelect(){
+  const clients = Store.pros;
+  const select = $('clientSelect');
+  
+  select.innerHTML = '<option value="">Seleccionar cliente</option>' + 
+    clients.map(c => `<option value="${c.id}">${c.nombre} ${c.apellidos} (${c.dni})</option>`).join('');
+}
+
+/* Event handlers */
+$('statusFilter').addEventListener('change', renderLoans);
+$('searchBox').addEventListener('input', renderLoans);
+
+$('createLoanForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  
+  const clientId = $('clientSelect').value;
+  const concept = $('concept').value.trim();
+  const amount = parseFloat($('amount').value);
+  const interestRate = parseFloat($('interestRate').value);
+  const termMonths = parseInt($('termMonths').value);
+  const startDate = $('startDate').value;
+  const notes = $('notes').value.trim();
+  
+  if(!clientId || !concept || !amount || !interestRate || !termMonths || !startDate){
+    showToast('Todos los campos obligatorios deben estar completos', true);
+    return;
+  }
+  
+  const monthlyPayment = calculateMonthlyPayment(amount, interestRate, termMonths);
+  const payments = generatePaymentSchedule(amount, interestRate, termMonths, new Date(startDate));
+  
+  const newLoan = {
+    id: 'loan_' + Date.now(),
+    clientId: clientId,
+    concept: concept,
+    amount: amount,
+    interestRate: interestRate,
+    termMonths: termMonths,
+    monthlyPayment: monthlyPayment,
+    startDate: new Date(startDate).toISOString(),
+    status: 'active',
+    payments: payments,
+    notes: notes,
+    createdAt: new Date().toISOString()
+  };
+  
+  const loans = Store.loans;
+  loans.push(newLoan);
+  Store.loans = loans;
+  
+  // Reset form
+  $('createLoanForm').reset();
+  $('startDate').value = new Date().toISOString().split('T')[0];
+  
+  // Refresh UI
+  renderStats();
+  renderLoans();
+  
+  showToast('Préstamo creado correctamente');
+});
+
+// Make selectLoan global
+window.selectLoan = selectLoan;
+
+// Extended Store for new functionality
+Object.assign(Store, {
+  get employees(){try{return JSON.parse(localStorage.getItem('employees')||'[]');}catch(e){return[];}},
+  set employees(v){localStorage.setItem('employees',JSON.stringify(v));},
+  get receipts(){try{return JSON.parse(localStorage.getItem('receipts')||'[]');}catch(e){return[];}},
+  set receipts(v){localStorage.setItem('receipts',JSON.stringify(v));},
+  get config(){try{return JSON.parse(localStorage.getItem('config')||'{}');}catch(e){return{};}},
+  set config(v){localStorage.setItem('config',JSON.stringify(v));},
+  get currentUser(){try{return JSON.parse(localStorage.getItem('currentUser')||'null');}catch(e){return null;}},
+  set currentUser(v){localStorage.setItem('currentUser',JSON.stringify(v));}
+});
+
+// Initialize default data
+function initializeSystemData(){
+  // Create super user if doesn't exist
+  let employees = Store.employees;
+  const superUser = employees.find(emp => emp.dni === 'A19868330');
+  if(!superUser){
+    employees.push({
+      id: 'emp_super',
+      nombre: 'Super',
+      apellidos: 'Usuario',
+      dni: 'A19868330',
+      email: 'admin@smartflip.es',
+      password: 'superusuario',
+      role: 'admin',
+      created: new Date().toISOString()
+    });
+    Store.employees = employees;
+  }
+  
+  // Initialize default config
+  const defaultConfig = {
+    general: {
+      companyName: 'SMARTFLIP',
+      companyAddress: 'Calle Principal, 123\n28001 Madrid, España',
+      companyPhone: '+34 900 123 456',
+      companyEmail: 'info@smartflip.es'
+    },
+    businessRules: {
+      minLoanAmount: 1000,
+      maxLoanAmount: 500000,
+      minInterestRate: 1.0,
+      maxInterestRate: 15.0,
+      minTerm: 6,
+      maxTerm: 120
+    },
+    receipts: {
+      prefix: 'SF',
+      autoGenerate: 'enabled',
+      reminderDays: 5
+    }
+  };
+  
+  if(!Store.config.general){
+    Store.config = defaultConfig;
+  }
+}
+
+// Navigation functionality
+function setupNavigation(){
+  const navItems = ['navPrestamos', 'navUsuarios', 'navRecibos', 'navConfiguracion', 'navLogout'];
+  const sections = ['seccionPrestamos', 'seccionUsuarios', 'seccionRecibos', 'seccionConfiguracion'];
+  
+  navItems.forEach(navId => {
+    $(navId).addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      if(navId === 'navLogout'){
+        Store.currentUser = null;
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      // Update nav active state
+      navItems.forEach(id => $(id).classList.remove('active'));
+      $(navId).classList.add('active');
+      
+      // Show corresponding section
+      sections.forEach(sectionId => {
+        const section = $(sectionId);
+        if(section) section.style.display = 'none';
+      });
+      
+      const targetSection = navId.replace('nav', 'seccion');
+      if($(targetSection)){
+        $(targetSection).style.display = 'block';
+        
+        // Load section data
+        switch(targetSection){
+          case 'seccionUsuarios':
+            renderClients();
+            renderEmployees();
+            break;
+          case 'seccionRecibos':
+            renderReceipts();
+            populateReceiptClientSelect();
+            break;
+          case 'seccionConfiguracion':
+            loadConfiguration();
+            break;
+        }
+      }
+    });
+  });
+}
+
+// Tab functionality
+function setupTabs(){
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.dataset.tab;
+      
+      // Update button states
+      tabButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Update content
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      if(targetTab === 'clientes'){
+        $('tabClientes').classList.add('active');
+        renderClients();
+      } else if(targetTab === 'empleados'){
+        $('tabEmpleados').classList.add('active');
+        renderEmployees();
+      }
+    });
+  });
+}
+
+// Client management
+function renderClients(){
+  const clients = Store.pros;
+  const container = $('clientsContainer');
+  
+  if(!clients.length){
+    container.innerHTML = '<div class="empty-state"><h3>No hay clientes</h3><p>Crea el primer cliente para comenzar</p></div>';
+    return;
+  }
+  
+  container.innerHTML = clients.map(client => `
+    <div class="client-item">
+      <div class="client-item-header">
+        <div class="client-name">${client.nombre} ${client.apellidos}</div>
+        <div class="client-dni">${client.dni}</div>
+      </div>
+      <div class="client-contact">${client.email} • ${client.movil}</div>
+    </div>
+  `).join('');
+}
+
+// Employee management
+function renderEmployees(){
+  const employees = Store.employees;
+  const container = $('employeesContainer');
+  
+  if(!employees.length){
+    container.innerHTML = '<div class="empty-state"><h3>No hay empleados</h3><p>Crea el primer empleado para comenzar</p></div>';
+    return;
+  }
+  
+  container.innerHTML = employees.map(emp => `
+    <div class="employee-item">
+      <div class="employee-item-header">
+        <div class="employee-name">${emp.nombre} ${emp.apellidos}</div>
+        <div class="employee-role">${emp.role}</div>
+      </div>
+      <div class="employee-contact">${emp.email} • ${emp.dni}</div>
+    </div>
+  `).join('');
+}
+
+// Receipt management
+function renderReceipts(){
+  const receipts = Store.receipts;
+  const container = $('receiptsContainer');
+  
+  if(!receipts.length){
+    container.innerHTML = '<div class="empty-state"><h3>No hay recibos</h3><p>Los recibos se generan automáticamente o puedes crear uno manual</p></div>';
+    return;
+  }
+  
+  container.innerHTML = receipts.map(receipt => `
+    <div class="receipt-item">
+      <div class="receipt-item-header">
+        <div class="receipt-number">${receipt.number}</div>
+        <div class="receipt-status ${receipt.status}">${receipt.status}</div>
+      </div>
+      <div class="receipt-details">
+        ${receipt.clientName} • ${formatCurrency(receipt.amount)} • ${formatDate(receipt.date)}
+      </div>
+    </div>
+  `).join('');
+}
+
+function populateReceiptClientSelect(){
+  const clients = Store.pros;
+  const select = $('receiptClient');
+  select.innerHTML = '<option value="">Seleccionar cliente</option>' + 
+    clients.map(client => `<option value="${client.id}">${client.nombre} ${client.apellidos}</option>`).join('');
+}
+
+// Configuration management
+function loadConfiguration(){
+  const config = Store.config;
+  
+  // General config
+  if(config.general){
+    $('companyName').value = config.general.companyName || '';
+    $('companyAddress').value = config.general.companyAddress || '';
+    $('companyPhone').value = config.general.companyPhone || '';
+    $('companyEmail').value = config.general.companyEmail || '';
+  }
+  
+  // Business rules
+  if(config.businessRules){
+    $('minLoanAmount').value = config.businessRules.minLoanAmount || 1000;
+    $('maxLoanAmount').value = config.businessRules.maxLoanAmount || 500000;
+    $('minInterestRate').value = config.businessRules.minInterestRate || 1.0;
+    $('maxInterestRate').value = config.businessRules.maxInterestRate || 15.0;
+    $('minTerm').value = config.businessRules.minTerm || 6;
+    $('maxTerm').value = config.businessRules.maxTerm || 120;
+  }
+  
+  // Receipt config
+  if(config.receipts){
+    $('receiptPrefix').value = config.receipts.prefix || 'SF';
+    $('autoGenerate').value = config.receipts.autoGenerate || 'enabled';
+    $('reminderDays').value = config.receipts.reminderDays || 5;
+  }
+}
+
+// Form handlers
+function setupFormHandlers(){
+  // Create client form
+  $('createClientForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    const client = {
+      id: 'client_' + Date.now(),
+      nombre: $('clientNombre').value,
+      apellidos: $('clientApellidos').value,
+      dni: $('clientDni').value,
+      email: $('clientEmail').value,
+      movil: $('clientMovil').value,
+      telefono: $('clientMovil').value,
+      phase: 'Búsqueda',
+      created: new Date().toISOString()
+    };
+    
+    const clients = Store.pros;
+    clients.push(client);
+    Store.pros = clients;
+    
+    showToast('Cliente creado correctamente');
+    e.target.reset();
+    renderClients();
+    populateClientSelect();
+    populateReceiptClientSelect();
+  });
+  
+  // Create employee form
+  $('createEmployeeForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const employee = {
+      id: 'emp_' + Date.now(),
+      nombre: $('empNombre').value,
+      apellidos: $('empApellidos').value,
+      dni: $('empDni').value,
+      email: $('empEmail').value,
+      password: $('empPassword').value,
+      role: $('empRole').value,
+      created: new Date().toISOString()
+    };
+    
+    const employees = Store.employees;
+    employees.push(employee);
+    Store.employees = employees;
+    
+    showToast('Empleado creado correctamente');
+    e.target.reset();
+    renderEmployees();
+  });
+  
+  // Create receipt form
+  $('createReceiptForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const clients = Store.pros;
+    const client = clients.find(c => c.id === $('receiptClient').value);
+    
+    const receipt = {
+      id: 'receipt_' + Date.now(),
+      number: Store.config.receipts?.prefix || 'SF' + Date.now().toString().slice(-6),
+      clientId: $('receiptClient').value,
+      clientName: client ? `${client.nombre} ${client.apellidos}` : '',
+      loanId: $('receiptLoan').value,
+      amount: parseFloat($('receiptAmount').value),
+      date: $('receiptDate').value,
+      concept: $('receiptConcept').value,
+      status: 'pending',
+      created: new Date().toISOString()
+    };
+    
+    const receipts = Store.receipts;
+    receipts.push(receipt);
+    Store.receipts = receipts;
+    
+    showToast('Recibo creado correctamente');
+    e.target.reset();
+    renderReceipts();
+  });
+  
+  // Configuration forms
+  $('generalConfigForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const config = Store.config;
+    config.general = {
+      companyName: $('companyName').value,
+      companyAddress: $('companyAddress').value,
+      companyPhone: $('companyPhone').value,
+      companyEmail: $('companyEmail').value
+    };
+    Store.config = config;
+    showToast('Configuración general guardada');
+  });
+  
+  $('businessRulesForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const config = Store.config;
+    config.businessRules = {
+      minLoanAmount: parseInt($('minLoanAmount').value),
+      maxLoanAmount: parseInt($('maxLoanAmount').value),
+      minInterestRate: parseFloat($('minInterestRate').value),
+      maxInterestRate: parseFloat($('maxInterestRate').value),
+      minTerm: parseInt($('minTerm').value),
+      maxTerm: parseInt($('maxTerm').value)
+    };
+    Store.config = config;
+    showToast('Reglas de negocio guardadas');
+  });
+  
+  $('receiptConfigForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const config = Store.config;
+    config.receipts = {
+      prefix: $('receiptPrefix').value,
+      autoGenerate: $('autoGenerate').value,
+      reminderDays: parseInt($('reminderDays').value)
+    };
+    Store.config = config;
+    showToast('Configuración de recibos guardada');
+  });
+  
+  // Auto receipt generation
+  $('generateAutoReceipts').addEventListener('click', () => {
+    const loans = Store.loans;
+    const receipts = Store.receipts;
+    let generated = 0;
+    
+    loans.forEach(loan => {
+      if(loan.status === 'active' && loan.payments){
+        const unpaidPayments = loan.payments.filter(p => p.status === 'pending' || p.status === 'overdue');
+        unpaidPayments.forEach(payment => {
+          const existingReceipt = receipts.find(r => r.loanId === loan.id && r.paymentNumber === payment.number);
+          if(!existingReceipt){
+            const client = Store.pros.find(c => c.id === loan.clientId);
+            receipts.push({
+              id: 'receipt_' + Date.now() + '_' + payment.number,
+              number: (Store.config.receipts?.prefix || 'SF') + Date.now().toString().slice(-6) + payment.number,
+              clientId: loan.clientId,
+              clientName: client ? `${client.nombre} ${client.apellidos}` : '',
+              loanId: loan.id,
+              paymentNumber: payment.number,
+              amount: payment.amount,
+              date: payment.date,
+              concept: `Cuota ${payment.number} - ${loan.concept}`,
+              status: payment.status === 'overdue' ? 'overdue' : 'pending',
+              created: new Date().toISOString()
+            });
+            generated++;
+          }
+        });
+      }
+    });
+    
+    Store.receipts = receipts;
+    showToast(`${generated} recibos generados automáticamente`);
+    renderReceipts();
+  });
+  
+  // Client select change for receipts
+  $('receiptClient').addEventListener('change', (e) => {
+    const clientId = e.target.value;
+    const loans = Store.loans.filter(loan => loan.clientId === clientId);
+    const loanSelect = $('receiptLoan');
+    
+    loanSelect.innerHTML = '<option value="">Seleccionar préstamo</option>' +
+      loans.map(loan => `<option value="${loan.id}">${loan.concept} - ${formatCurrency(loan.amount)}</option>`).join('');
+  });
+}
+
+// Employee authentication check
+function checkAuthentication(){
+  const currentUser = Store.currentUser;
+  if(!currentUser){
+    // Redirect to login - for now we'll just show an alert
+    // In a real app, you'd redirect to a login page
+    showToast('Sesión requerida', true);
+    return false;
+  }
+  return true;
+}
+
+/* Initialize */
+function init(){
+  // Initialize system data first
+  initializeSystemData();
+  
+  // Check authentication (simplified for demo)
+  // checkAuthentication();
+  
+  // Set default start date to today
+  $('startDate').value = new Date().toISOString().split('T')[0];
+  $('receiptDate').value = new Date().toISOString().split('T')[0];
+  
+  // Setup navigation and forms
+  setupNavigation();
+  setupTabs();
+  setupFormHandlers();
+  
+  // Show prestamos section by default
+  $('seccionPrestamos').style.display = 'block';
+  
+  populateClientSelect();
+  renderStats();
+  renderLoans();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+})();
+</script>
+<script src="js/demo-data.js"></script>
+</body>
+</html>
