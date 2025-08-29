@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Smartflip — Panel del Cliente</title>
+<style>
+:root{
+  --brand:#2E7D32; --accent:#4CAF50; --ok:#2E7D32; --bad:#B53928; --warning:#F57C00;
+  --line:#E0E0E0; --chip:#F8F9FA; --bg:#F5F5F5; --ink:#1a1f23; --ink2:#535b63;
+  --shadow:0 4px 22px rgba(0,0,0,.1); --ff:system-ui,-apple-system,Inter,Roboto,Arial,sans-serif; --fz:14px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff);font-size:var(--fz)}
+
+/* Header */
+.header{
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  padding:16px 0;
+  box-shadow:var(--shadow);
+}
+
+.header-inner{
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.logo h1{
+  margin:0;
+  color:var(--brand);
+  font-size:24px;
+  font-weight:800;
+}
+
+.user-info{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  color:var(--ink2);
+}
+
+.user-name{
+  font-weight:600;
+}
+
+.logout-btn{
+  background:var(--bad);
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  padding:8px 16px;
+  font-size:12px;
+  cursor:pointer;
+}
+
+/* Container */
+.container{
+  max-width:1200px;
+  margin:0 auto;
+  padding:24px 20px;
+}
+
+/* Welcome */
+.welcome{
+  background:#fff;
+  border-radius:12px;
+  padding:24px;
+  margin-bottom:24px;
+  box-shadow:var(--shadow);
+}
+
+.welcome h2{
+  margin:0 0 8px;
+  color:var(--brand);
+  font-size:24px;
+}
+
+.welcome p{
+  margin:0;
+  color:var(--ink2);
+}
+
+/* Stats */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+  gap:16px;
+  margin-bottom:24px;
+}
+
+.stat-card{
+  background:#fff;
+  border-radius:12px;
+  padding:20px;
+  box-shadow:var(--shadow);
+  text-align:center;
+}
+
+.stat-value{
+  font-size:28px;
+  font-weight:800;
+  margin-bottom:4px;
+}
+
+.stat-label{
+  color:var(--ink2);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+
+.stat-card.active .stat-value{color:var(--brand)}
+.stat-card.completed .stat-value{color:var(--ok)}
+.stat-card.pending .stat-value{color:var(--warning)}
+
+/* Loans */
+.loans-section{
+  background:#fff;
+  border-radius:12px;
+  padding:24px;
+  box-shadow:var(--shadow);
+  margin-bottom:24px;
+}
+
+.section-title{
+  margin:0 0 20px;
+  color:var(--ink);
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.loan-card{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:20px;
+  margin-bottom:16px;
+  background:#fafafa;
+}
+
+.loan-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+}
+
+.loan-title{
+  font-size:18px;
+  font-weight:700;
+  color:var(--ink);
+}
+
+.loan-status{
+  padding:4px 12px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:600;
+  text-transform:uppercase;
+}
+
+.status-active{background:#E8F5E8; color:var(--brand)}
+.status-completed{background:#E3F2FD; color:#1976D2}
+.status-pending{background:#FFF3E0; color:var(--warning)}
+
+.loan-details{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
+  gap:16px;
+  margin-bottom:16px;
+}
+
+.detail-item{
+  text-align:center;
+}
+
+.detail-value{
+  font-size:18px;
+  font-weight:700;
+  color:var(--brand);
+}
+
+.detail-label{
+  font-size:12px;
+  color:var(--ink2);
+  margin-top:4px;
+}
+
+/* Progress */
+.progress-section{
+  margin-top:16px;
+}
+
+.progress-bar{
+  background:#E0E0E0;
+  border-radius:10px;
+  height:8px;
+  overflow:hidden;
+  margin-bottom:8px;
+}
+
+.progress-fill{
+  background:linear-gradient(90deg, var(--brand), var(--accent));
+  height:100%;
+  transition:width 0.3s ease;
+}
+
+.progress-text{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:var(--ink2);
+}
+
+/* Payment timeline */
+.timeline{
+  margin-top:20px;
+}
+
+.timeline-item{
+  display:flex;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px solid #f0f0f0;
+}
+
+.timeline-date{
+  width:100px;
+  font-size:12px;
+  color:var(--ink2);
+}
+
+.timeline-amount{
+  width:100px;
+  font-weight:600;
+  text-align:right;
+}
+
+.timeline-status{
+  margin-left:auto;
+  padding:2px 8px;
+  border-radius:12px;
+  font-size:11px;
+}
+
+.payment-paid{background:#E8F5E8; color:var(--brand)}
+.payment-pending{background:#FFF3E0; color:var(--warning)}
+.payment-overdue{background:#FFEBEE; color:var(--bad)}
+
+/* Empty state */
+.empty-state{
+  text-align:center;
+  padding:40px;
+  color:var(--ink2);
+}
+
+.empty-state h3{
+  margin:0 0 8px;
+  color:var(--ink);
+}
+
+/* Actions */
+.actions{
+  display:flex;
+  gap:12px;
+  margin-top:16px;
+}
+
+.btn{
+  background:var(--brand);
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  padding:8px 16px;
+  font-size:12px;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-block;
+}
+
+.btn-secondary{
+  background:#fff;
+  color:var(--brand);
+  border:1px solid var(--brand);
+}
+
+.btn:hover{
+  background:#1B5E20;
+}
+
+.btn-secondary:hover{
+  background:var(--chip);
+}
+
+/* Responsive */
+@media (max-width: 768px){
+  .header-inner{
+    flex-direction:column;
+    gap:12px;
+  }
+  
+  .loan-header{
+    flex-direction:column;
+    gap:8px;
+    align-items:flex-start;
+  }
+  
+  .loan-details{
+    grid-template-columns:repeat(2, 1fr);
+  }
+  
+  .actions{
+    flex-direction:column;
+  }
+}
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <h1>SMARTFLIP</h1>
+      </div>
+      <div class="user-info">
+        <span class="user-name" id="userName">Cliente</span>
+        <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="welcome">
+      <h2 id="welcomeMessage">Bienvenido</h2>
+      <p>Gestione sus préstamos y consulte el estado de sus pagos</p>
+    </div>
+
+    <div class="stats" id="stats">
+      <!-- Stats will be populated by JavaScript -->
+    </div>
+
+    <div class="loans-section">
+      <h3 class="section-title">
+        Mis Préstamos
+        <span id="loanCount">0</span>
+      </h3>
+      <div id="loansContainer">
+        <!-- Loans will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+"use strict";
+
+/* Utilities */
+function $(id){return document.getElementById(id);}
+function formatCurrency(amount){
+  return new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR', maximumFractionDigits:2}).format(Number(amount||0));
+}
+function formatDate(date){
+  return new Date(date).toLocaleDateString('es-ES');
+}
+function formatPercent(value){
+  return `${Number(value||0).toFixed(1)}%`;
+}
+
+/* Store helper */
+const Store = {
+  get pros(){try{return JSON.parse(localStorage.getItem('pros')||'[]');}catch(e){return[];}},
+  get loans(){try{return JSON.parse(localStorage.getItem('loans')||'[]');}catch(e){return[];}},
+  get currentClient(){try{return JSON.parse(sessionStorage.getItem('currentClient')||'null');}catch(e){return null;}},
+  set currentClient(v){sessionStorage.setItem('currentClient',JSON.stringify(v));}
+};
+
+/* Auth check */
+function checkAuth(){
+  const client = Store.currentClient;
+  if(!client){
+    window.location.href = 'cliente-login.html';
+    return false;
+  }
+  return client;
+}
+
+/* Generate sample loan data for demonstration */
+function generateSampleLoan(client){
+  const loanId = 'loan_' + Date.now();
+  const amount = 50000 + Math.random() * 200000; // 50k to 250k
+  const rate = 3 + Math.random() * 4; // 3% to 7%
+  const termMonths = 12 + Math.floor(Math.random() * 108); // 1 to 9 years
+  const startDate = new Date();
+  startDate.setMonth(startDate.getMonth() - Math.floor(Math.random() * 12)); // Started within last year
+  
+  const monthlyPayment = calculateMonthlyPayment(amount, rate, termMonths);
+  const payments = generatePaymentSchedule(amount, rate, termMonths, startDate);
+  
+  return {
+    id: loanId,
+    clientId: client.id,
+    concept: `Préstamo Personal ${Math.floor(Math.random() * 1000)}`,
+    amount: amount,
+    interestRate: rate,
+    termMonths: termMonths,
+    monthlyPayment: monthlyPayment,
+    startDate: startDate.toISOString(),
+    status: 'active',
+    payments: payments,
+    createdAt: startDate.toISOString()
+  };
+}
+
+/* Loan calculations */
+function calculateMonthlyPayment(principal, annualRate, months){
+  const monthlyRate = annualRate / 100 / 12;
+  if(monthlyRate === 0) return principal / months;
+  return principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+}
+
+function generatePaymentSchedule(principal, annualRate, months, startDate){
+  const monthlyRate = annualRate / 100 / 12;
+  const monthlyPayment = calculateMonthlyPayment(principal, annualRate, months);
+  const payments = [];
+  let balance = principal;
+  
+  for(let i = 0; i < months; i++){
+    const paymentDate = new Date(startDate);
+    paymentDate.setMonth(paymentDate.getMonth() + i + 1);
+    
+    const interestPayment = balance * monthlyRate;
+    const principalPayment = monthlyPayment - interestPayment;
+    balance -= principalPayment;
+    
+    const isPaid = paymentDate < new Date(); // Past payments are "paid"
+    const isOverdue = paymentDate < new Date() && !isPaid && Math.random() > 0.9; // 10% chance of overdue
+    
+    payments.push({
+      number: i + 1,
+      date: paymentDate.toISOString(),
+      amount: monthlyPayment,
+      principal: principalPayment,
+      interest: interestPayment,
+      balance: Math.max(0, balance),
+      status: isOverdue ? 'overdue' : (isPaid ? 'paid' : 'pending')
+    });
+  }
+  
+  return payments;
+}
+
+/* Create sample data if none exists */
+function ensureSampleData(client){
+  let loans = Store.loans;
+  const clientLoans = loans.filter(l => l.clientId === client.id);
+  
+  if(clientLoans.length === 0){
+    // Create 1-2 sample loans for this client
+    const numLoans = Math.random() > 0.7 ? 2 : 1;
+    for(let i = 0; i < numLoans; i++){
+      loans.push(generateSampleLoan(client));
+    }
+    localStorage.setItem('loans', JSON.stringify(loans));
+  }
+  
+  return loans.filter(l => l.clientId === client.id);
+}
+
+/* Render functions */
+function renderStats(loans){
+  const totalAmount = loans.reduce((sum, loan) => sum + loan.amount, 0);
+  const activeLoans = loans.filter(l => l.status === 'active').length;
+  const totalPaid = loans.reduce((sum, loan) => {
+    return sum + loan.payments.filter(p => p.status === 'paid').reduce((pSum, p) => pSum + p.amount, 0);
+  }, 0);
+  
+  const avgProgress = loans.length > 0 ? 
+    loans.reduce((sum, loan) => {
+      const paidPayments = loan.payments.filter(p => p.status === 'paid').length;
+      return sum + (paidPayments / loan.payments.length * 100);
+    }, 0) / loans.length : 0;
+
+  $('stats').innerHTML = `
+    <div class="stat-card active">
+      <div class="stat-value">${activeLoans}</div>
+      <div class="stat-label">Préstamos Activos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${formatCurrency(totalAmount)}</div>
+      <div class="stat-label">Importe Total</div>
+    </div>
+    <div class="stat-card completed">
+      <div class="stat-value">${formatCurrency(totalPaid)}</div>
+      <div class="stat-label">Total Pagado</div>
+    </div>
+    <div class="stat-card pending">
+      <div class="stat-value">${formatPercent(avgProgress)}</div>
+      <div class="stat-label">Progreso Medio</div>
+    </div>
+  `;
+}
+
+function renderLoan(loan){
+  const paidPayments = loan.payments.filter(p => p.status === 'paid').length;
+  const progress = (paidPayments / loan.payments.length) * 100;
+  const nextPayment = loan.payments.find(p => p.status === 'pending');
+  const totalPaid = loan.payments.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
+  const remaining = loan.amount - totalPaid;
+
+  return `
+    <div class="loan-card">
+      <div class="loan-header">
+        <div class="loan-title">${loan.concept}</div>
+        <div class="loan-status status-${loan.status}">${loan.status === 'active' ? 'Activo' : 'Completado'}</div>
+      </div>
+      
+      <div class="loan-details">
+        <div class="detail-item">
+          <div class="detail-value">${formatCurrency(loan.amount)}</div>
+          <div class="detail-label">Importe</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-value">${formatPercent(loan.interestRate)}</div>
+          <div class="detail-label">Tipo de Interés</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-value">${loan.termMonths} meses</div>
+          <div class="detail-label">Plazo</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-value">${formatCurrency(loan.monthlyPayment)}</div>
+          <div class="detail-label">Cuota Mensual</div>
+        </div>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${progress}%"></div>
+        </div>
+        <div class="progress-text">
+          <span>Progreso: ${formatPercent(progress)}</span>
+          <span>${paidPayments}/${loan.payments.length} pagos realizados</span>
+        </div>
+      </div>
+
+      ${nextPayment ? `
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">Próximo pago:</div>
+            <div style="flex:1; margin-left:12px">${formatDate(nextPayment.date)}</div>
+            <div class="timeline-amount">${formatCurrency(nextPayment.amount)}</div>
+            <div class="timeline-status payment-${nextPayment.status}">
+              ${nextPayment.status === 'pending' ? 'Pendiente' : nextPayment.status === 'paid' ? 'Pagado' : 'Vencido'}
+            </div>
+          </div>
+        </div>
+      ` : ''}
+
+      <div class="actions">
+        <button class="btn" onclick="showPaymentHistory('${loan.id}')">Ver Historial</button>
+        <a href="#" class="btn btn-secondary" onclick="downloadContract('${loan.id}')">Descargar Contrato</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderLoans(loans){
+  $('loanCount').textContent = loans.length;
+  
+  if(loans.length === 0){
+    $('loansContainer').innerHTML = `
+      <div class="empty-state">
+        <h3>No tiene préstamos activos</h3>
+        <p>Cuando tenga préstamos activos aparecerán aquí</p>
+      </div>
+    `;
+  } else {
+    $('loansContainer').innerHTML = loans.map(renderLoan).join('');
+  }
+}
+
+/* Event handlers */
+function showPaymentHistory(loanId){
+  const loans = Store.loans;
+  const loan = loans.find(l => l.id === loanId);
+  if(!loan) return;
+  
+  alert(`Historial de pagos para ${loan.concept}:\n\n` + 
+    loan.payments.slice(0, 5).map(p => 
+      `${formatDate(p.date)}: ${formatCurrency(p.amount)} - ${p.status === 'paid' ? 'Pagado' : p.status === 'pending' ? 'Pendiente' : 'Vencido'}`
+    ).join('\n') + 
+    (loan.payments.length > 5 ? '\n... y más' : '')
+  );
+}
+
+function downloadContract(loanId){
+  const loans = Store.loans;
+  const loan = loans.find(l => l.id === loanId);
+  if(!loan) return;
+  
+  const client = Store.currentClient;
+  const contractText = `
+CONTRATO DE PRÉSTAMO - SMARTFLIP
+
+Cliente: ${client.nombre} ${client.apellidos}
+DNI: ${client.dni}
+Email: ${client.email}
+
+Préstamo: ${loan.concept}
+Importe: ${formatCurrency(loan.amount)}
+Tipo de interés: ${formatPercent(loan.interestRate)}
+Plazo: ${loan.termMonths} meses
+Cuota mensual: ${formatCurrency(loan.monthlyPayment)}
+
+Fecha de inicio: ${formatDate(loan.startDate)}
+
+© Smartflip - Gestión de Préstamos
+  `.trim();
+  
+  const blob = new Blob([contractText], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `contrato-${loan.id}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* Logout */
+$('logoutBtn').addEventListener('click', function(){
+  if(confirm('¿Está seguro de que desea cerrar sesión?')){
+    sessionStorage.removeItem('currentClient');
+    window.location.href = 'cliente-login.html';
+  }
+});
+
+/* Initialize */
+function init(){
+  const client = checkAuth();
+  if(!client) return;
+  
+  // Set user info
+  $('userName').textContent = `${client.nombre} ${client.apellidos}`;
+  $('welcomeMessage').textContent = `Bienvenido, ${client.nombre}`;
+  
+  // Get loans and render
+  const loans = ensureSampleData(client);
+  renderStats(loans);
+  renderLoans(loans);
+}
+
+// Make functions global for onclick handlers
+window.showPaymentHistory = showPaymentHistory;
+window.downloadContract = downloadContract;
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', init);
+
+})();
+</script>
+</body>
+</html>
