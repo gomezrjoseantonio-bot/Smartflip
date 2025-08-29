@@ -1,1 +1,225 @@
-<meta http-equiv="refresh" content="0; url=evaluar.html">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Smartflip — Sistema de Gestión de Préstamos</title>
+<style>
+:root{
+  --brand:#2E7D32; --accent:#4CAF50; --ok:#2E7D32; --bad:#B53928;
+  --line:#E0E0E0; --chip:#F8F9FA; --bg:#F5F5F5; --ink:#1a1f23; --ink2:#535b63;
+  --shadow:0 4px 22px rgba(0,0,0,.1); --ff:system-ui,-apple-system,Inter,Roboto,Arial,sans-serif; --fz:14px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff);font-size:var(--fz)}
+
+.hero{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg, var(--bg) 0%, #E8F5E8 100%);
+  padding:20px;
+}
+
+.hero-container{
+  background:#fff;
+  border-radius:20px;
+  box-shadow:var(--shadow);
+  padding:40px;
+  width:100%;
+  max-width:600px;
+  text-align:center;
+}
+
+.logo{
+  margin-bottom:32px;
+}
+
+.logo h1{
+  margin:0;
+  color:var(--brand);
+  font-size:36px;
+  font-weight:800;
+  letter-spacing:-1px;
+}
+
+.logo .subtitle{
+  color:var(--ink2);
+  font-size:18px;
+  margin-top:8px;
+  font-weight:500;
+}
+
+.description{
+  color:var(--ink2);
+  font-size:16px;
+  line-height:1.6;
+  margin-bottom:40px;
+}
+
+.access-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin-bottom:40px;
+}
+
+.access-card{
+  background:var(--chip);
+  border:2px solid var(--line);
+  border-radius:16px;
+  padding:24px;
+  text-decoration:none;
+  color:var(--ink);
+  transition:all 0.3s ease;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.access-card:hover{
+  border-color:var(--brand);
+  background:#fff;
+  transform:translateY(-2px);
+  box-shadow:var(--shadow);
+}
+
+.access-card .icon{
+  width:48px;
+  height:48px;
+  background:var(--brand);
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:24px;
+  font-weight:800;
+  margin-bottom:16px;
+}
+
+.access-card h3{
+  margin:0 0 8px;
+  color:var(--brand);
+  font-size:18px;
+  font-weight:700;
+}
+
+.access-card p{
+  margin:0;
+  color:var(--ink2);
+  font-size:14px;
+  text-align:center;
+  line-height:1.4;
+}
+
+.admin-section{
+  border-top:1px solid var(--line);
+  padding-top:24px;
+}
+
+.admin-section h4{
+  margin:0 0 16px;
+  color:var(--ink);
+  font-size:16px;
+  font-weight:600;
+}
+
+.admin-links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  justify-content:center;
+}
+
+.admin-link{
+  background:var(--brand);
+  color:#fff;
+  text-decoration:none;
+  padding:8px 16px;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:600;
+  transition:background 0.2s ease;
+}
+
+.admin-link:hover{
+  background:#1B5E20;
+}
+
+.footer{
+  text-align:center;
+  margin-top:24px;
+  color:var(--ink2);
+  font-size:12px;
+}
+
+@media (max-width: 600px){
+  .access-grid{
+    grid-template-columns:1fr;
+  }
+  
+  .hero-container{
+    padding:24px;
+  }
+  
+  .logo h1{
+    font-size:28px;
+  }
+  
+  .admin-links{
+    flex-direction:column;
+  }
+}
+</style>
+</head>
+<body>
+  <div class="hero">
+    <div class="hero-container">
+      <div class="logo">
+        <h1>SMARTFLIP</h1>
+        <div class="subtitle">Sistema de Gestión de Préstamos</div>
+      </div>
+
+      <div class="description">
+        Bienvenido al sistema completo de gestión de préstamos Smartflip. 
+        Acceda como cliente para consultar sus préstamos o como administrador para gestionar todo el sistema.
+      </div>
+
+      <div class="demo-info" style="background:#E8F5E8; border:1px solid var(--brand); border-radius:12px; padding:16px; margin-bottom:24px; font-size:14px;">
+        <strong>🚀 Sistema Demo Listo:</strong> Use las credenciales <strong>DNI: 12345678A</strong>, <strong>Email: ana.garcia@example.com</strong>, <strong>Móvil: 600123456</strong> para acceder al portal del cliente con datos de ejemplo.
+      </div>
+
+      <div class="access-grid">
+        <a href="cliente-login.html" class="access-card">
+          <div class="icon">👤</div>
+          <h3>Portal del Cliente</h3>
+          <p>Acceso seguro para consultar el estado de sus préstamos, historial de pagos y contratos</p>
+        </a>
+
+        <a href="admin-prestamos.html" class="access-card">
+          <div class="icon">⚙️</div>
+          <h3>Administración</h3>
+          <p>Gestión completa de préstamos, creación de nuevos préstamos y administración de clientes</p>
+        </a>
+      </div>
+
+      <div class="admin-section">
+        <h4>Acceso Adicional</h4>
+        <div class="admin-links">
+          <a href="dashboard.html" class="admin-link">CRM Unihouser</a>
+          <a href="configuracion.html" class="admin-link">Configuración</a>
+        </div>
+      </div>
+
+      <div class="footer">
+        © 2025 Smartflip · Gestión de Préstamos
+      </div>
+    </div>
+  </div>
+
+<script src="js/demo-data.js"></script>
+</body>
+</html>
