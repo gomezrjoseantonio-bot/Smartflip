@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Smartflip — Acceso Empleados</title>
+<style>
+:root{
+  --brand:#2E7D32; --accent:#4CAF50; --ok:#2E7D32; --bad:#B53928;
+  --line:#E0E0E0; --chip:#F8F9FA; --bg:#F5F5F5; --ink:#1a1f23; --ink2:#535b63;
+  --shadow:0 4px 22px rgba(0,0,0,.1); --ff:system-ui,-apple-system,Inter,Roboto,Arial,sans-serif; --fz:14px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff);font-size:var(--fz);display:flex;align-items:center;justify-content:center}
+
+.login-container{
+  background:#fff;
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:32px;
+  width:100%;
+  max-width:400px;
+  margin:20px;
+}
+
+.logo{
+  text-align:center;
+  margin-bottom:32px;
+}
+
+.logo h1{
+  margin:0;
+  color:var(--brand);
+  font-size:28px;
+  font-weight:800;
+}
+
+.logo .subtitle{
+  color:var(--ink2);
+  font-size:16px;
+  margin-top:4px;
+}
+
+.form-group{
+  margin-bottom:20px;
+}
+
+.form-group label{
+  display:block;
+  margin-bottom:6px;
+  color:var(--ink);
+  font-weight:600;
+  font-size:12px;
+}
+
+.form-group input{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  font-size:14px;
+  transition:border-color 0.2s ease;
+}
+
+.form-group input:focus{
+  outline:none;
+  border-color:var(--brand);
+}
+
+.btn{
+  width:100%;
+  padding:12px;
+  background:var(--brand);
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:background-color 0.2s ease;
+}
+
+.btn:hover{
+  background:#1B5E20;
+}
+
+.btn:disabled{
+  background:#ccc;
+  cursor:not-allowed;
+}
+
+.error-message{
+  background:#FFEBEE;
+  color:var(--bad);
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:20px;
+  font-size:12px;
+  display:none;
+}
+
+.back-link{
+  text-align:center;
+  margin-top:20px;
+}
+
+.back-link a{
+  color:var(--brand);
+  text-decoration:none;
+  font-size:12px;
+}
+
+.demo-info{
+  background:var(--chip);
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:20px;
+  font-size:12px;
+}
+
+.demo-info h4{
+  margin:0 0 8px;
+  color:var(--brand);
+}
+
+.demo-info p{
+  margin:0;
+  color:var(--ink2);
+}
+</style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <h1>SMARTFLIP</h1>
+      <div class="subtitle">Acceso Empleados</div>
+    </div>
+
+    <div class="demo-info">
+      <h4>Acceso de Demostración</h4>
+      <p><strong>DNI:</strong> A19868330<br>
+      <strong>Contraseña:</strong> superusuario</p>
+    </div>
+
+    <div class="error-message" id="errorMessage"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="dni">DNI</label>
+        <input type="text" id="dni" placeholder="A19868330" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" placeholder="Introduce tu contraseña" required>
+      </div>
+
+      <button type="submit" class="btn">Iniciar Sesión</button>
+    </form>
+
+    <div class="back-link">
+      <a href="index.html">← Volver al inicio</a>
+    </div>
+  </div>
+
+<script>
+(function(){
+"use strict";
+
+function $(id){return document.getElementById(id);}
+
+function showError(message){
+  const errorDiv = $('errorMessage');
+  errorDiv.textContent = message;
+  errorDiv.style.display = 'block';
+}
+
+function hideError(){
+  $('errorMessage').style.display = 'none';
+}
+
+// Store helper
+const Store = {
+  get employees(){try{return JSON.parse(localStorage.getItem('employees')||'[]');}catch(e){return[];}},
+  set currentUser(v){localStorage.setItem('currentUser',JSON.stringify(v));}
+};
+
+// Initialize super user if doesn't exist
+function initializeSuperUser(){
+  let employees = Store.employees;
+  const superUser = employees.find(emp => emp.dni === 'A19868330');
+  if(!superUser){
+    employees.push({
+      id: 'emp_super',
+      nombre: 'Super',
+      apellidos: 'Usuario',
+      dni: 'A19868330',
+      email: 'admin@smartflip.es',
+      password: 'superusuario',
+      role: 'admin',
+      created: new Date().toISOString()
+    });
+    localStorage.setItem('employees', JSON.stringify(employees));
+  }
+}
+
+$('loginForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  hideError();
+  
+  const dni = $('dni').value.trim();
+  const password = $('password').value;
+  
+  if(!dni || !password){
+    showError('Por favor, introduce DNI y contraseña');
+    return;
+  }
+  
+  const employees = Store.employees;
+  const employee = employees.find(emp => emp.dni === dni && emp.password === password);
+  
+  if(!employee){
+    showError('DNI o contraseña incorrectos');
+    return;
+  }
+  
+  // Store current user session
+  Store.currentUser = {
+    id: employee.id,
+    nombre: employee.nombre,
+    apellidos: employee.apellidos,
+    dni: employee.dni,
+    email: employee.email,
+    role: employee.role,
+    loginTime: new Date().toISOString()
+  };
+  
+  // Redirect to admin panel
+  window.location.href = 'admin-prestamos.html';
+});
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', () => {
+  initializeSuperUser();
+});
+
+})();
+</script>
+</body>
+</html>

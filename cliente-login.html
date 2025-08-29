@@ -148,28 +148,85 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff);font-s
 
     <div id="error" class="error"></div>
 
-    <div class="info">
-      Para acceder a su área personal, introduzca sus datos de identificación
+    <!-- Email + Password Login Form -->
+    <div id="emailLoginForm" style="display:none">
+      <div class="info">
+        Introduce tu email y contraseña para acceder
+      </div>
+      
+      <form id="emailPasswordForm">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="cliente@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Contraseña</label>
+          <input type="password" id="loginPassword" placeholder="Tu contraseña" required>
+        </div>
+
+        <button type="submit" class="btn">Acceder</button>
+      </form>
+      
+      <div style="text-align:center; margin-top:16px;">
+        <a href="#" id="forgotPasswordLink" style="color:var(--brand); font-size:12px;">¿Olvidaste tu contraseña? Usar acceso completo</a>
+      </div>
     </div>
 
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="dni">DNI</label>
-        <input type="text" id="dni" placeholder="12345678A" maxlength="9" required>
+    <!-- Three-Factor Login Form -->
+    <div id="threeFactorForm">
+      <div class="info">
+        Para acceder a su área personal, introduzca sus datos de identificación
       </div>
 
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="cliente@example.com" required>
-      </div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="dni">DNI</label>
+          <input type="text" id="dni" placeholder="12345678A" maxlength="9" required>
+        </div>
 
-      <div class="form-group">
-        <label for="movil">Móvil</label>
-        <input type="tel" id="movil" placeholder="600123456" maxlength="15" required>
-      </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="cliente@example.com" required>
+        </div>
 
-      <button type="submit" class="btn" id="loginBtn">Acceder</button>
-    </form>
+        <div class="form-group">
+          <label for="movil">Móvil</label>
+          <input type="tel" id="movil" placeholder="600123456" maxlength="15" required>
+        </div>
+
+        <button type="submit" class="btn" id="loginBtn">Acceder</button>
+      </form>
+      
+      <div style="text-align:center; margin-top:16px;">
+        <a href="#" id="usePasswordLink" style="color:var(--brand); font-size:12px;">¿Ya tienes contraseña? Usar acceso rápido</a>
+      </div>
+    </div>
+
+    <!-- Password Creation Form -->
+    <div id="passwordCreationForm" style="display:none">
+      <div class="info">
+        Es tu primera vez. Crea una contraseña para accesos futuros más rápidos
+      </div>
+      
+      <form id="createPasswordForm">
+        <div class="form-group">
+          <label for="newPassword">Nueva Contraseña</label>
+          <input type="password" id="newPassword" placeholder="Mínimo 6 caracteres" minlength="6" required>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirmar Contraseña</label>
+          <input type="password" id="confirmPassword" placeholder="Repite la contraseña" minlength="6" required>
+        </div>
+
+        <button type="submit" class="btn">Crear Contraseña y Acceder</button>
+      </form>
+      
+      <div style="text-align:center; margin-top:16px;">
+        <a href="#" id="skipPasswordLink" style="color:var(--brand); font-size:12px;">Omitir por ahora</a>
+      </div>
+    </div>
 
     <div id="loading" class="loading">
       <div class="loading-spinner"></div>
@@ -199,13 +256,16 @@ function showError(msg){
 /* Store helper */
 const Store = {
   get pros(){try{return JSON.parse(localStorage.getItem('pros')||'[]');}catch(e){return[];}},
+  set pros(v){localStorage.setItem('pros',JSON.stringify(v));},
   get loans(){try{return JSON.parse(localStorage.getItem('loans')||'[]');}catch(e){return[];}},
   get currentClient(){try{return JSON.parse(sessionStorage.getItem('currentClient')||'null');}catch(e){return null;}},
   set currentClient(v){sessionStorage.setItem('currentClient',JSON.stringify(v));}
 };
 
+let currentAuthenticatedClient = null;
+
 /* Authentication */
-function authenticate(dni, email, movil){
+function authenticateThreeFactor(dni, email, movil){
   const clients = Store.pros;
   
   // Normalize inputs
@@ -225,7 +285,86 @@ function authenticate(dni, email, movil){
   return client;
 }
 
-/* Form handling */
+function authenticateEmailPassword(email, password){
+  const clients = Store.pros;
+  email = email.trim().toLowerCase();
+  
+  const client = clients.find(c => {
+    const clientEmail = (c.email || '').trim().toLowerCase();
+    return clientEmail === email && c.password === password;
+  });
+  
+  return client;
+}
+
+function setClientPassword(clientId, password){
+  const clients = Store.pros;
+  const clientIndex = clients.findIndex(c => c.id === clientId);
+  if(clientIndex !== -1){
+    clients[clientIndex].password = password;
+    clients[clientIndex].hasPassword = true;
+    Store.pros = clients;
+    return true;
+  }
+  return false;
+}
+
+function showForm(formId){
+  const forms = ['emailLoginForm', 'threeFactorForm', 'passwordCreationForm'];
+  forms.forEach(id => {
+    $(id).style.display = 'none';
+  });
+  $(formId).style.display = 'block';
+}
+
+/* Form switching */
+$('usePasswordLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  showForm('emailLoginForm');
+});
+
+$('forgotPasswordLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  showForm('threeFactorForm');
+});
+
+$('skipPasswordLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  if(currentAuthenticatedClient){
+    Store.currentClient = currentAuthenticatedClient;
+    window.location.href = 'cliente-dashboard.html';
+  }
+});
+
+/* Email + Password Login */
+$('emailPasswordForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  
+  const email = $('loginEmail').value;
+  const password = $('loginPassword').value;
+  
+  if(!email || !password){
+    showError('Email y contraseña son obligatorios');
+    return;
+  }
+  
+  // Show loading
+  $('loading').style.display = 'block';
+  
+  setTimeout(() => {
+    const client = authenticateEmailPassword(email, password);
+    
+    if(client){
+      Store.currentClient = client;
+      window.location.href = 'cliente-dashboard.html';
+    } else {
+      showError('Email o contraseña incorrectos');
+      $('loading').style.display = 'none';
+    }
+  }, 1000);
+});
+
+/* Three-Factor Login */
 $('loginForm').addEventListener('submit', function(e){
   e.preventDefault();
   
@@ -242,21 +381,80 @@ $('loginForm').addEventListener('submit', function(e){
   $('loginBtn').disabled = true;
   $('loading').style.display = 'block';
   
-  // Simulate auth delay
   setTimeout(() => {
-    const client = authenticate(dni, email, movil);
+    const client = authenticateThreeFactor(dni, email, movil);
     
     if(client){
-      // Success - store session and redirect
-      Store.currentClient = client;
-      window.location.href = 'cliente-dashboard.html';
+      currentAuthenticatedClient = client;
+      
+      // Check if client already has a password
+      if(client.hasPassword){
+        // Go directly to dashboard
+        Store.currentClient = client;
+        window.location.href = 'cliente-dashboard.html';
+      } else {
+        // Show password creation form
+        $('loginBtn').disabled = false;
+        $('loading').style.display = 'none';
+        showForm('passwordCreationForm');
+      }
     } else {
-      // Failure
       showError('Credenciales incorrectas. Verifique DNI, email y móvil.');
       $('loginBtn').disabled = false;
       $('loading').style.display = 'none';
     }
   }, 1500);
+});
+
+/* Password Creation */
+$('createPasswordForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  
+  const newPassword = $('newPassword').value;
+  const confirmPassword = $('confirmPassword').value;
+  
+  if(!newPassword || !confirmPassword){
+    showError('Todos los campos de contraseña son obligatorios');
+    return;
+  }
+  
+  if(newPassword !== confirmPassword){
+    showError('Las contraseñas no coinciden');
+    return;
+  }
+  
+  if(newPassword.length < 6){
+    showError('La contraseña debe tener al menos 6 caracteres');
+    return;
+  }
+  
+  if(currentAuthenticatedClient){
+    const success = setClientPassword(currentAuthenticatedClient.id, newPassword);
+    if(success){
+      // Update current client object
+      currentAuthenticatedClient.password = newPassword;
+      currentAuthenticatedClient.hasPassword = true;
+      
+      Store.currentClient = currentAuthenticatedClient;
+      window.location.href = 'cliente-dashboard.html';
+    } else {
+      showError('Error al crear la contraseña. Inténtelo de nuevo.');
+    }
+  }
+});
+
+/* Initialize */
+document.addEventListener('DOMContentLoaded', function(){
+  // Check if we have stored credentials preference
+  const hasPasswordUsers = Store.pros.some(client => client.hasPassword);
+  
+  if(hasPasswordUsers){
+    // Show email login form by default if there are users with passwords
+    showForm('emailLoginForm');
+  } else {
+    // Show three-factor form by default
+    showForm('threeFactorForm');
+  }
 });
 
 /* Input formatting */
